@@ -54,6 +54,12 @@
 
   *{box-sizing:border-box;}
   html,body{ margin:0; }
+  /* FIX : .lightbox/.stats/.toolbar/.grid déclarent chacun un display
+     explicite (flex/grid) qui, à spécificité égale, l'emporte sur la règle
+     [hidden]{display:none} du navigateur -- sans ça, ces éléments restaient
+     visibles même une fois "cachés" via el.hidden=true (lightbox bloquée à
+     l'écran dès le chargement, vide, alors qu'elle n'avait jamais été ouverte). */
+  [hidden]{ display:none !important; }
   body{
     background:var(--bg);
     color:var(--ink);
