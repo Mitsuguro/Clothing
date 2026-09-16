@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clothing Contact Sheet</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f9d52'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle' fill='%23081' %3E%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#f6f4ee;
+    --surface:#ffffff;
+    --surface-2:#eeece3;
+    --ink:#1b1d18;
+    --ink-dim:#6b7066;
+    --line:#dedad0;
+    --accent:#1f9d52;
+    --accent-ink:#08210f;
+    --chip:#eef1e7;
+    --danger:#b3452f;
+    --shadow: 0 1px 2px rgba(20,20,10,.04), 0 8px 24px -12px rgba(20,20,10,.12);
+    --radius-card: 10px;
+    --radius-pill: 999px;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#121410;
+      --surface:#1a1d17;
+      --surface-2:#20241d;
+      --ink:#edf0e7;
+      --ink-dim:#8b9184;
+      --line:#2c3128;
+      --accent:#4fd47c;
+      --accent-ink:#04140a;
+      --chip:#232720;
+      --danger:#e08a72;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121410;
+    --surface:#1a1d17;
+    --surface-2:#20241d;
+    --ink:#edf0e7;
+    --ink-dim:#8b9184;
+    --line:#2c3128;
+    --accent:#4fd47c;
+    --accent-ink:#04140a;
+    --chip:#232720;
+    --danger:#e08a72;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{ margin:0; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    padding-inline:16px;
+    padding-block:20px 40px;
+  }
+  h1,h2,h3{ text-wrap:balance; margin:0; }
+  a{ color:inherit; }
+  button{ font-family:inherit; }
+
+  .wrap{ max-width:1180px; margin-inline:auto; display:flex; flex-direction:column; gap:18px; }
+
+  /* ---------- Header ---------- */
+  .masthead{
+    display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:10px 20px;
+    padding-bottom:14px; border-bottom:1px solid var(--line);
+  }
+  .masthead .title-block{ display:flex; flex-direction:column; gap:4px; }
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--accent); font-weight:600;
+  }
+  .masthead h1{ font-size:26px; font-weight:800; letter-spacing:-.01em; }
+  .masthead .sub{ color:var(--ink-dim); font-size:13.5px; max-width:52ch; }
+  .repo-tag{
+    font-family:var(--mono); font-size:12px; color:var(--ink-dim);
+    display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+  }
+  .repo-tag button{
+    border:1px solid var(--line); background:var(--surface); color:var(--ink-dim);
+    border-radius:var(--radius-pill); padding:3px 10px; font-size:11px; cursor:pointer;
+  }
+  .repo-tag button:hover{ color:var(--ink); border-color:var(--accent); }
+
+  /* ---------- Stats ---------- */
+  .stats{ display:flex; gap:10px; flex-wrap:wrap; }
+  .stat{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card);
+    padding:10px 14px; min-width:104px; box-shadow:var(--shadow);
+  }
+  .stat .n{ font-family:var(--mono); font-size:20px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .stat .l{ font-size:11px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.06em; margin-top:2px; }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card);
+    padding:10px; box-shadow:var(--shadow);
+  }
+  .toolbar input[type="search"]{
+    flex:1 1 200px; min-width:140px; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:8px; padding:8px 10px; color:var(--ink); font-size:13.5px;
+  }
+  .toolbar select{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:8px;
+    padding:8px 10px; color:var(--ink); font-size:13px; font-family:inherit;
+  }
+  .seg{ display:flex; border:1px solid var(--line); border-radius:var(--radius-pill); overflow:hidden; }
+  .seg button{
+    background:transparent; border:none; padding:7px 12px; font-size:12.5px; color:var(--ink-dim);
+    cursor:pointer; border-right:1px solid var(--line);
+  }
+  .seg button:last-child{ border-right:none; }
+  .seg button[aria-pressed="true"]{ background:var(--accent); color:var(--accent-ink); font-weight:700; }
+  .toolbar .spacer{ flex:1 1 auto; }
+  .btn{
+    display:inline-flex; align-items:center; gap:6px; border-radius:var(--radius-pill);
+    border:1px solid var(--line); background:var(--surface-2); color:var(--ink);
+    font-size:12.5px; padding:8px 12px; cursor:pointer; white-space:nowrap;
+  }
+  .btn:hover{ border-color:var(--accent); }
+  .btn.primary{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:700; }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+  /* ---------- States ---------- */
+  .state{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    padding:56px 20px; text-align:center; color:var(--ink-dim); border:1px dashed var(--line);
+    border-radius:var(--radius-card); background:var(--surface);
+  }
+  .state strong{ color:var(--ink); font-size:15px; }
+  .state code{
+    font-family:var(--mono); background:var(--chip); padding:2px 6px; border-radius:5px; font-size:12px;
+  }
+  .spinner{
+    width:22px; height:22px; border-radius:50%; border:2.5px solid var(--line);
+    border-top-color:var(--accent); animation:spin .8s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ .spinner{ animation-duration:1.8s; } }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- Grid ---------- */
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(148px,1fr)); gap:12px;
+  }
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card);
+    overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column;
+  }
+  .thumb-btn{
+    all:unset; cursor:zoom-in; display:block; aspect-ratio:1; width:100%;
+    background:
+      linear-gradient(45deg, var(--chip) 25%, transparent 25%) -8px 0/16px 16px,
+      linear-gradient(-45deg, var(--chip) 25%, transparent 25%) -8px 0/16px 16px,
+      linear-gradient(45deg, transparent 75%, var(--chip) 75%) -8px 0/16px 16px,
+      linear-gradient(-45deg, transparent 75%, var(--chip) 75%) -8px 0/16px 16px,
+      var(--surface-2);
+  }
+  .thumb-btn img{ width:100%; height:100%; object-fit:contain; display:block; }
+  .card .meta{ padding:9px 10px 10px; display:flex; flex-direction:column; gap:6px; }
+  .card .cat{ font-size:12.5px; font-weight:700; line-height:1.25; }
+  .card .idline{
+    font-family:var(--mono); font-size:10.5px; color:var(--ink-dim); display:flex; gap:6px; align-items:center;
+  }
+  .badge{
+    font-family:var(--mono); font-size:9.5px; letter-spacing:.04em; text-transform:uppercase;
+    padding:2px 6px; border-radius:5px; background:var(--chip); color:var(--ink-dim); font-weight:700;
+  }
+  .badge.male{ color:#3f7cd6; }
+  .badge.female{ color:#c05e9c; }
+  .card .row{ display:flex; gap:6px; margin-top:2px; }
+  .card .row button, .card .row a{
+    flex:1; text-align:center; font-size:11px; padding:6px 4px; border-radius:6px;
+    border:1px solid var(--line); background:var(--surface-2); color:var(--ink); cursor:pointer;
+    text-decoration:none; display:flex; align-items:center; justify-content:center; gap:4px;
+  }
+  .card .row button:hover, .card .row a:hover{ border-color:var(--accent); color:var(--accent); }
+  .card .row button.copied{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+
+  /* ---------- Lightbox ---------- */
+  .lightbox{
+    position:fixed; inset:0; background:rgba(10,10,8,.82); display:flex; align-items:center;
+    justify-content:center; padding:24px; z-index:50;
+  }
+  .lightbox-panel{
+    background:var(--surface); border-radius:14px; max-width:min(560px,94vw); width:100%;
+    box-shadow:var(--shadow); overflow:hidden; border:1px solid var(--line); position:relative;
+  }
+  .lightbox-img{
+    aspect-ratio:1; width:100%;
+    background:
+      linear-gradient(45deg, var(--chip) 25%, transparent 25%) -10px 0/20px 20px,
+      linear-gradient(-45deg, var(--chip) 25%, transparent 25%) -10px 0/20px 20px,
+      linear-gradient(45deg, transparent 75%, var(--chip) 75%) -10px 0/20px 20px,
+      linear-gradient(-45deg, transparent 75%, var(--chip) 75%) -10px 0/20px 20px,
+      var(--surface-2);
+  }
+  .lightbox-img img{ width:100%; height:100%; object-fit:contain; display:block; }
+  .lightbox-body{ padding:14px 16px 16px; display:flex; flex-direction:column; gap:10px; }
+  .lightbox-body h3{ font-size:16px; }
+  .lightbox-body .url{
+    font-family:var(--mono); font-size:11px; color:var(--ink-dim); word-break:break-all;
+    background:var(--chip); padding:8px 10px; border-radius:7px;
+  }
+  .lightbox-close{
+    all:unset; position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%;
+    background:var(--surface); border:1px solid var(--line); display:flex; align-items:center;
+    justify-content:center; cursor:pointer; color:var(--ink);
+  }
+
+  footer.note{ font-size:11.5px; color:var(--ink-dim); text-align:center; padding-top:6px; }
+  footer.note code{ font-family:var(--mono); background:var(--chip); padding:1px 5px; border-radius:4px; }
+
+  @media (max-width:460px){
+    .masthead h1{ font-size:21px; }
+    .grid{ grid-template-columns:repeat(auto-fill, minmax(128px,1fr)); }
+  }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap">
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="title-block">
+      <span class="eyebrow">Planche contact</span>
+      <h1>Clothing Contact Sheet</h1>
+      <p class="sub">Vignettes générées par clothing-generator (fond vert), hébergées dans ce dépôt — parcours, filtre, récupère l'URL brute de chaque image.</p>
+    </div>
+    <div class="repo-tag">
+      <span id="repoLabel">Mitsuguro/Clothing @ main</span>
+      <button id="editRepoBtn" type="button">changer</button>
+    </div>
+  </div>
+
+  <div class="stats" id="stats" hidden>
+    <div class="stat"><div class="n" id="statTotal">0</div><div class="l">Images</div></div>
+    <div class="stat"><div class="n" id="statCats">0</div><div class="l">Catégories</div></div>
+    <div class="stat"><div class="n" id="statMale">0</div><div class="l">Homme</div></div>
+    <div class="stat"><div class="n" id="statFemale">0</div><div class="l">Femme</div></div>
+  </div>
+
+  <div class="toolbar" id="toolbar" hidden>
+    <input type="search" id="searchInput" placeholder="Chercher (catégorie, fichier, numéro…)" aria-label="Recherche">
+    <select id="catSelect" aria-label="Catégorie">
+      <option value="">Toutes catégories</option>
+    </select>
+    <div class="seg" role="group" aria-label="Genre">
+      <button type="button" data-gender="" aria-pressed="true">Tous</button>
+      <button type="button" data-gender="male" aria-pressed="false">Homme</button>
+      <button type="button" data-gender="female" aria-pressed="false">Femme</button>
+    </div>
+    <div class="seg" role="group" aria-label="Type">
+      <button type="button" data-kind="" aria-pressed="true">Tout</button>
+      <button type="button" data-kind="clothing" aria-pressed="false">Vêtements</button>
+      <button type="button" data-kind="prop" aria-pressed="false">Accessoires</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="copyAllBtn" type="button">Copier les URL affichées</button>
+    <button class="btn" id="refreshBtn" type="button">Actualiser</button>
+  </div>
+
+  <div id="stateHost">
+    <div class="state">
+      <div class="spinner" role="status" aria-label="Chargement"></div>
+      <strong>Lecture du dépôt…</strong>
+      <span id="repoLabel2" style="font-family:var(--mono); font-size:12px;"></span>
+    </div>
+  </div>
+
+  <div class="grid" id="grid" hidden></div>
+
+  <footer class="note">Source : <code id="apiNote"></code> — accès public en lecture, aucun jeton utilisé côté page.</footer>
+</div>
+
+<div class="lightbox" id="lightbox" hidden>
+  <div class="lightbox-panel">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Fermer">✕</button>
+    <div class="lightbox-img"><img id="lightboxImg" alt=""></div>
+    <div class="lightbox-body">
+      <h3 id="lightboxTitle"></h3>
+      <div class="url" id="lightboxUrl"></div>
+      <div class="row" style="display:flex; gap:8px;">
+        <button class="btn primary" id="lightboxCopy" type="button" style="flex:1;">Copier l'URL</button>
+        <a class="btn" id="lightboxOpen" href="#" target="_blank" rel="noopener" style="flex:1; text-align:center;">Ouvrir en grand</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var CLOTHING_NAMES = {1:"Masks",3:"Torsos",4:"Legs",5:"Bags",6:"Shoes",7:"Accessories",8:"Undershirts",9:"Body Armors",11:"Tops"};
+  var PROPS_NAMES = {0:"Hats",1:"Glasses",2:"Ears",6:"Watches",7:"Bracelets"};
+  var IMG_EXT = /\.(png|jpg|jpeg|webp)$/i;
+  var SELF_FILES = /^(index\.html|readme\.md|license)$/i;
+
+  var state = {
+    owner: "Mitsuguro", repo: "Clothing", branch: "main",
+    items: [], filtered: [],
+    filters: { q: "", gender: "", kind: "", cat: "" }
+  };
+
+  try {
+    var saved = JSON.parse(localStorage.getItem("ccs_repo") || "null");
+    if (saved && saved.owner && saved.repo) {
+      state.owner = saved.owner; state.repo = saved.repo; state.branch = saved.branch || "main";
+    }
+  } catch (e) {}
+
+  var els = {
+    repoLabel: document.getElementById("repoLabel"),
+    repoLabel2: document.getElementById("repoLabel2"),
+    editRepoBtn: document.getElementById("editRepoBtn"),
+    stats: document.getElementById("stats"),
+    statTotal: document.getElementById("statTotal"),
+    statCats: document.getElementById("statCats"),
+    statMale: document.getElementById("statMale"),
+    statFemale: document.getElementById("statFemale"),
+    toolbar: document.getElementById("toolbar"),
+    searchInput: document.getElementById("searchInput"),
+    catSelect: document.getElementById("catSelect"),
+    stateHost: document.getElementById("stateHost"),
+    grid: document.getElementById("grid"),
+    copyAllBtn: document.getElementById("copyAllBtn"),
+    refreshBtn: document.getElementById("refreshBtn"),
+    apiNote: document.getElementById("apiNote"),
+    lightbox: document.getElementById("lightbox"),
+    lightboxImg: document.getElementById("lightboxImg"),
+    lightboxTitle: document.getElementById("lightboxTitle"),
+    lightboxUrl: document.getElementById("lightboxUrl"),
+    lightboxCopy: document.getElementById("lightboxCopy"),
+    lightboxOpen: document.getElementById("lightboxOpen"),
+    lightboxClose: document.getElementById("lightboxClose")
+  };
+
+  function rawUrl(path){
+    return "https://raw.githubusercontent.com/" + state.owner + "/" + state.repo + "/" + state.branch + "/" + path;
+  }
+
+  function parseFilename(nameNoExt){
+    var parts = nameNoExt.split("_");
+    var gender = parts[0] === "female" ? "female" : (parts[0] === "male" ? "male" : "unknown");
+    var isProp = parts[1] === "prop";
+    var idx = isProp ? 2 : 1;
+    var componentId = parseInt(parts[idx], 10);
+    var drawable = parseInt(parts[idx + 1], 10);
+    var texture = parts[idx + 2] !== undefined ? parseInt(parts[idx + 2], 10) : null;
+    var names = isProp ? PROPS_NAMES : CLOTHING_NAMES;
+    var catName = (names[componentId]) || (isProp ? "Accessoire #" + componentId : "Vêtement #" + componentId);
+    return {
+      gender: gender, isProp: isProp, componentId: isNaN(componentId) ? null : componentId,
+      drawable: isNaN(drawable) ? null : drawable, texture: texture, catName: catName
+    };
+  }
+
+  function setState(html){
+    els.stateHost.hidden = false;
+    els.stateHost.innerHTML = html;
+    els.grid.hidden = true;
+    els.stats.hidden = true;
+    els.toolbar.hidden = true;
+  }
+
+  function updateRepoLabel(){
+    var label = state.owner + "/" + state.repo + " @ " + state.branch;
+    els.repoLabel.textContent = label;
+    els.repoLabel2.textContent = label;
+    els.apiNote.textContent = "api.github.com/repos/" + state.owner + "/" + state.repo;
+  }
+
+  async function load(){
+    updateRepoLabel();
+    setState(
+      '<div class="state"><div class="spinner" role="status" aria-label="Chargement"></div>' +
+      '<strong>Lecture du dépôt…</strong>' +
+      '<span style="font-family:var(--mono); font-size:12px;">' + state.owner + '/' + state.repo + '</span></div>'
+    );
+
+    var treeUrl = "https://api.github.com/repos/" + state.owner + "/" + state.repo + "/git/trees/" + state.branch + "?recursive=1";
+    var res;
+    try {
+      res = await fetch(treeUrl, { headers: { Accept: "application/vnd.github+json" } });
+    } catch (e) {
+      setState(errorState("Impossible de contacter l'API GitHub (réseau).", String(e)));
+      return;
+    }
+
+    if (res.status === 404) {
+      setState(errorState(
+        "Dépôt ou branche introuvable.",
+        "Vérifie que « " + state.owner + "/" + state.repo + " » existe, est public, et que la branche « " + state.branch + " » est correcte."
+      ));
+      return;
+    }
+    if (!res.ok) {
+      var txt = await res.text().catch(function(){ return ""; });
+      setState(errorState("Erreur API GitHub (" + res.status + ").", txt.slice(0, 200)));
+      return;
+    }
+
+    var json = await res.json();
+    var blobs = (json.tree || []).filter(function(e){
+      return e.type === "blob" && IMG_EXT.test(e.path) && !SELF_FILES.test(e.path.split("/").pop());
+    });
+
+    if (blobs.length === 0){
+      setState(
+        '<div class="state"><strong>Aucune image pour l\'instant.</strong>' +
+        '<span>Lance une génération en jeu (<code>/clothgenmenu</code>, ou <code>/screenshot</code>) — les images apparaîtront ici dès qu\'elles seront poussées sur GitHub.</span>' +
+        '<button class="btn" id="emptyRefresh" type="button" style="margin-top:6px;">Réessayer</button></div>'
+      );
+      var eb = document.getElementById("emptyRefresh");
+      if (eb) eb.addEventListener("click", load);
+      return;
+    }
+
+    state.items = blobs.map(function(e){
+      var fileName = e.path.split("/").pop();
+      var nameNoExt = fileName.replace(IMG_EXT, "");
+      var parsed = parseFilename(nameNoExt);
+      return Object.assign({ path: e.path, fileName: fileName, url: rawUrl(e.path) }, parsed);
+    });
+
+    populateCategoryOptions();
+    els.stateHost.hidden = true;
+    els.stats.hidden = false;
+    els.toolbar.hidden = false;
+    els.grid.hidden = false;
+    applyFilters();
+  }
+
+  function errorState(title, detail){
+    return '<div class="state"><strong style="color:var(--danger);">' + escapeHtml(title) + '</strong>' +
+      (detail ? '<span><code>' + escapeHtml(detail) + '</code></span>' : '') +
+      '<button class="btn" id="errRetry" type="button" style="margin-top:6px;">Réessayer</button></div>';
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function populateCategoryOptions(){
+    var counts = {};
+    state.items.forEach(function(it){ counts[it.catName] = (counts[it.catName] || 0) + 1; });
+    var names = Object.keys(counts).sort();
+    els.catSelect.innerHTML = '<option value="">Toutes catégories</option>' +
+      names.map(function(n){ return '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + ' (' + counts[n] + ')</option>'; }).join("");
+  }
+
+  function applyFilters(){
+    var f = state.filters;
+    var q = f.q.trim().toLowerCase();
+    state.filtered = state.items.filter(function(it){
+      if (f.gender && it.gender !== f.gender) return false;
+      if (f.kind === "prop" && !it.isProp) return false;
+      if (f.kind === "clothing" && it.isProp) return false;
+      if (f.cat && it.catName !== f.cat) return false;
+      if (q && (it.catName + " " + it.fileName).toLowerCase().indexOf(q) === -1) return false;
+      return true;
+    });
+    renderGrid();
+    renderStats();
+  }
+
+  function renderStats(){
+    els.statTotal.textContent = state.filtered.length;
+    var cats = {}; var male = 0, female = 0;
+    state.filtered.forEach(function(it){
+      cats[it.catName] = true;
+      if (it.gender === "male") male++;
+      if (it.gender === "female") female++;
+    });
+    els.statCats.textContent = Object.keys(cats).length;
+    els.statMale.textContent = male;
+    els.statFemale.textContent = female;
+  }
+
+  function renderGrid(){
+    if (state.filtered.length === 0){
+      els.grid.innerHTML = '<div class="state" style="grid-column:1/-1;"><strong>Rien pour ces filtres.</strong><span>Essaie une autre catégorie ou vide la recherche.</span></div>';
+      return;
+    }
+    var frag = document.createDocumentFragment();
+    state.filtered.forEach(function(it){
+      var card = document.createElement("div");
+      card.className = "card";
+
+      var thumbBtn = document.createElement("button");
+      thumbBtn.className = "thumb-btn";
+      thumbBtn.type = "button";
+      thumbBtn.setAttribute("aria-label", "Agrandir " + it.catName);
+      var img = document.createElement("img");
+      img.loading = "lazy";
+      img.src = it.url;
+      img.alt = it.catName + (it.drawable !== null ? " #" + it.drawable : "");
+      thumbBtn.appendChild(img);
+      thumbBtn.addEventListener("click", function(){ openLightbox(it); });
+
+      var meta = document.createElement("div");
+      meta.className = "meta";
+      var catEl = document.createElement("div");
+      catEl.className = "cat";
+      catEl.textContent = it.catName;
+      var idline = document.createElement("div");
+      idline.className = "idline";
+      var genderBadge = document.createElement("span");
+      genderBadge.className = "badge " + it.gender;
+      genderBadge.textContent = it.gender === "male" ? "H" : it.gender === "female" ? "F" : "?";
+      var idText = document.createElement("span");
+      idText.textContent = "#" + (it.drawable !== null ? it.drawable : "?");
+      idline.appendChild(genderBadge);
+      idline.appendChild(idText);
+
+      var row = document.createElement("div");
+      row.className = "row";
+      var copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.textContent = "Copier";
+      copyBtn.addEventListener("click", function(){ copyText(it.url, copyBtn); });
+      var openLink = document.createElement("a");
+      openLink.href = it.url;
+      openLink.target = "_blank";
+      openLink.rel = "noopener";
+      openLink.textContent = "Ouvrir";
+      row.appendChild(copyBtn);
+      row.appendChild(openLink);
+
+      meta.appendChild(catEl);
+      meta.appendChild(idline);
+      meta.appendChild(row);
+      card.appendChild(thumbBtn);
+      card.appendChild(meta);
+      frag.appendChild(card);
+    });
+    els.grid.innerHTML = "";
+    els.grid.appendChild(frag);
+  }
+
+  async function copyText(text, btn){
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      try {
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      } catch (e2) { return; }
+    }
+    if (btn){
+      var original = btn.textContent;
+      btn.textContent = "Copié !";
+      btn.classList.add("copied");
+      setTimeout(function(){ btn.textContent = original; btn.classList.remove("copied"); }, 1200);
+    }
+  }
+
+  function openLightbox(it){
+    els.lightboxImg.src = it.url;
+    els.lightboxImg.alt = it.catName;
+    els.lightboxTitle.textContent = it.catName + " — " + (it.gender === "male" ? "Homme" : it.gender === "female" ? "Femme" : "?") + " #" + (it.drawable !== null ? it.drawable : "?");
+    els.lightboxUrl.textContent = it.url;
+    els.lightboxOpen.href = it.url;
+    els.lightboxCopy.onclick = function(){ copyText(it.url, els.lightboxCopy); };
+    els.lightbox.hidden = false;
+  }
+  els.lightboxClose.addEventListener("click", function(){ els.lightbox.hidden = true; });
+  els.lightbox.addEventListener("click", function(e){ if (e.target === els.lightbox) els.lightbox.hidden = true; });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") els.lightbox.hidden = true; });
+
+  els.searchInput.addEventListener("input", function(){ state.filters.q = els.searchInput.value; applyFilters(); });
+  els.catSelect.addEventListener("change", function(){ state.filters.cat = els.catSelect.value; applyFilters(); });
+
+  document.querySelectorAll('.seg [data-gender]').forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll('.seg [data-gender]').forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
+      btn.setAttribute("aria-pressed", "true");
+      state.filters.gender = btn.getAttribute("data-gender");
+      applyFilters();
+    });
+  });
+  document.querySelectorAll('.seg [data-kind]').forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll('.seg [data-kind]').forEach(function(b){ b.setAttribute("aria-pressed", "false"); });
+      btn.setAttribute("aria-pressed", "true");
+      state.filters.kind = btn.getAttribute("data-kind");
+      applyFilters();
+    });
+  });
+
+  els.copyAllBtn.addEventListener("click", function(){
+    var urls = state.filtered.map(function(it){ return it.url; }).join("\n");
+    copyText(urls, els.copyAllBtn);
+  });
+  els.refreshBtn.addEventListener("click", load);
+
+  els.editRepoBtn.addEventListener("click", function(){
+    var current = state.owner + "/" + state.repo;
+    var input = window.prompt("Dépôt GitHub (owner/repo) :", current);
+    if (!input) return;
+    var m = input.trim().split("/");
+    if (m.length !== 2 || !m[0] || !m[1]) { window.alert("Format attendu : owner/repo"); return; }
+    var branch = window.prompt("Branche :", state.branch) || state.branch;
+    state.owner = m[0]; state.repo = m[1]; state.branch = branch.trim() || "main";
+    try { localStorage.setItem("ccs_repo", JSON.stringify({ owner: state.owner, repo: state.repo, branch: state.branch })); } catch (e) {}
+    load();
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>
